@@ -1,9 +1,15 @@
 import { IUserRepository } from "../../interfaces/repository/IUserRepository";
-import  {ISignupDTO, ISignupResponseDTO} from "../../dtos/auth.dto"
+
+import {
+  ISignupDTO,
+  ISignupResponseDTO,
+} from "../../dtos/auth.dto";
+
 import { IPasswordHasher } from "../../interfaces/service/auth/IPasswordHasher";
-import {IAuthService} from "../../interfaces/service/auth/IAuthService"
+import { IAuthService } from "../../interfaces/service/auth/IAuthService";
 import { ConflictError } from "../../errors/conflict.error";
 import { UserRole } from "../../types/auth.types";
+import { UserMapper } from "../../mappers/user.mapper";
 
 export class AuthService implements IAuthService {
   constructor(
@@ -14,7 +20,6 @@ export class AuthService implements IAuthService {
   async signup(
     input: ISignupDTO,
   ): Promise<ISignupResponseDTO> {
-
     const normalizedEmail = input.email
       .trim()
       .toLowerCase();
@@ -23,7 +28,7 @@ export class AuthService implements IAuthService {
       await this.userRepository.findByEmail(
         normalizedEmail,
       );
-  
+
     if (existingUser) {
       throw new ConflictError(
         "An account with this email already exists",
@@ -43,12 +48,6 @@ export class AuthService implements IAuthService {
         role: UserRole.STUDENT,
       });
 
-    return {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      emailVerified: user.emailVerified,
-    };
+    return UserMapper.toSignupResponse(user);
   }
 }
