@@ -1,4 +1,3 @@
-import {IUser} from "../../models/user/user.model"
 import { IUserRepository } from "../../interfaces/repository/IUserRepository";
 import  {ISignupDTO, ISignupResponseDTO} from "../../dtos/auth.dto"
 import { IPasswordHasher } from "../../interfaces/service/auth/IPasswordHasher";

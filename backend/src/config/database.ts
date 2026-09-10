@@ -1,5 +1,6 @@
 
 import mongoose from 'mongoose';
+import { logger } from "./logger";
 
 export const connectDB = async (): Promise<void> => {
   try {
@@ -9,9 +10,9 @@ export const connectDB = async (): Promise<void> => {
     }
 
     await mongoose.connect(mongoURI);
-    console.log('MongoDB Connected Successfully'); // Later we replace this with Winston (Rule 16)
+    logger.info("MongoDB connected successfully");
   } catch (error) {
-    console.error('Database connection failed:', error);
+    logger.error(error, "MongoDB connection failed");
     process.exit(1);
   }
 };
