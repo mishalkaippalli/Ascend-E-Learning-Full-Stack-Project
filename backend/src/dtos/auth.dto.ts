@@ -14,3 +14,8 @@ export interface ISignupResponseDTO {
   role: UserRole;
   emailVerified: boolean;
 }
+
+export interface IVerifyOtpDTO {
+  email: string;
+  otp: string;
+}

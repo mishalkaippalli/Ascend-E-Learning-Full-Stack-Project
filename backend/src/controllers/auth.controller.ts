@@ -4,7 +4,11 @@ import {
   Response,
 } from "express";
 
-import { ISignupDTO } from "../dtos/auth.dto";
+import { 
+  ISignupDTO,
+  IVerifyOtpDTO
+     } from "../dtos/auth.dto";
+
 import { IAuthService } from "../interfaces/service/auth/IAuthService";
 
 export class AuthController {
@@ -25,6 +29,27 @@ export class AuthController {
       res.status(201).json({
         success: true,
         data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyEmailOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const otpData: IVerifyOtpDTO = req.body;
+
+      await this.authService.verifyEmailOtp(
+        otpData,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Email verified successfully",
       });
     } catch (error) {
       next(error);
