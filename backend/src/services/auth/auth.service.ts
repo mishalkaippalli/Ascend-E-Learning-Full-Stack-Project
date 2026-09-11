@@ -4,6 +4,7 @@ import {
   ISignupDTO,
   ISignupResponseDTO,
   IVerifyOtpDTO,
+  IResendOtpDTO
 } from "../../dtos/auth.dto";
 
 import { IPasswordHasher } from "../../interfaces/service/auth/IPasswordHasher";
@@ -11,6 +12,7 @@ import { IAuthService } from "../../interfaces/service/auth/IAuthService";
 import { ConflictError } from "../../errors/conflict.error";
 import { BadRequestError } from "../../errors/bad-request.error";
 import { NotFoundError } from "../../errors/not-found.error";
+import { TooManyRequestsError } from "../../errors/too-many-requests.error";
 import { UserRole } from "../../types/auth.types";
 import { UserMapper } from "../../mappers/user.mapper";
 import { IOtpService } from "../../interfaces/service/auth/IOtpService";
@@ -106,4 +108,55 @@ export class AuthService implements IAuthService {
       true,
     );
   }
+
+  async resendEmailOtp(
+    input: IResendOtpDTO,
+  ): Promise<void> {
+    const normalizedEmail = input.email
+      .trim()
+      .toLowerCase();
+
+    const user =
+      await this.userRepository.findByEmail(
+        normalizedEmail,
+      );
+
+    if (!user) {
+      throw new NotFoundError(
+        "User not found",
+      );
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestError(
+        "Email is already verified",
+      );
+    }
+
+
+    const otp =
+      await this.otpService.generateAndStore(
+        normalizedEmail,
+        OtpPurpose.EMAIL_VERIFICATION,
+      );
+
+    await this.emailService.sendVerificationOtp(
+      normalizedEmail,
+      otp,
+    );
+
+    const cooldownAcquired =
+      await this.otpService.acquireResendCooldown(
+        normalizedEmail,
+        OtpPurpose.EMAIL_VERIFICATION,
+      );
+
+    if (!cooldownAcquired) {
+      throw new TooManyRequestsError(
+        "Please wait before requesting another OTP",
+      );
+    }
+
+  }
+  
 }

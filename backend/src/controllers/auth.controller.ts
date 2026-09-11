@@ -6,7 +6,8 @@ import {
 
 import { 
   ISignupDTO,
-  IVerifyOtpDTO
+  IVerifyOtpDTO,
+  IResendOtpDTO
      } from "../dtos/auth.dto";
 
 import { IAuthService } from "../interfaces/service/auth/IAuthService";
@@ -50,6 +51,27 @@ export class AuthController {
       res.status(200).json({
         success: true,
         message: "Email verified successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendEmailOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const otpData: IResendOtpDTO = req.body;
+
+      await this.authService.resendEmailOtp(
+        otpData,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "OTP sent successfully",
       });
     } catch (error) {
       next(error);

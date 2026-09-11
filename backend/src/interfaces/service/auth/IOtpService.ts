@@ -11,4 +11,9 @@ export interface IOtpService {
     purpose: OtpPurpose,
     otp: string,
   ): Promise<boolean>;
+
+  acquireResendCooldown(
+    identifier: string,
+    purpose: OtpPurpose,
+  ): Promise<boolean>;
 }

@@ -19,3 +19,7 @@ export interface IVerifyOtpDTO {
   email: string;
   otp: string;
 }
+
+export interface IResendOtpDTO {
+  email: string;
+}

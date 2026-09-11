@@ -2,6 +2,7 @@ import {
   ISignupDTO,
   ISignupResponseDTO,
   IVerifyOtpDTO,
+  IResendOtpDTO
 } from "../../../dtos/auth.dto";
 
 export interface IAuthService {
@@ -11,5 +12,9 @@ export interface IAuthService {
 
   verifyEmailOtp(
     data: IVerifyOtpDTO,
+  ): Promise<void>;
+
+  resendEmailOtp(
+    data: IResendOtpDTO,
   ): Promise<void>;
 }

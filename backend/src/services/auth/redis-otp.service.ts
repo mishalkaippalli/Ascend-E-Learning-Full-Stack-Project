@@ -6,12 +6,20 @@ import { OtpPurpose } from "../../types/auth.types";
 
 export class RedisOtpService implements IOtpService {
   private readonly otpExpirationSeconds = 300;
+  private readonly resendCooldownSeconds = 60;
 
   private getKey(
     identifier: string,
     purpose: OtpPurpose,
   ): string {
     return `otp:${purpose}:${identifier}`;
+  }
+  
+  private getCooldownKey(
+   identifier: string,
+   purpose: OtpPurpose,
+  ): string {
+   return `otp:cooldown:${purpose}:${identifier}`;
   }
 
   async generateAndStore(
@@ -53,6 +61,27 @@ export class RedisOtpService implements IOtpService {
     await redisClient.del(key);
 
     return true;
+  }
+
+  async acquireResendCooldown(
+    identifier: string,
+    purpose: OtpPurpose,
+  ): Promise<boolean> {
+    const key = this.getCooldownKey(
+      identifier,
+      purpose,
+    );
+
+    const result = await redisClient.set(
+      key,
+      "1",
+      {
+        EX: this.resendCooldownSeconds,
+        NX: true,
+      },
+    );
+
+    return result === "OK";
   }
 }
 
