@@ -7,10 +7,12 @@ import {
 import { 
   ISignupDTO,
   IVerifyOtpDTO,
-  IResendOtpDTO
+  IResendOtpDTO,
+  ILoginDTO
      } from "../dtos/auth.dto";
 
 import { IAuthService } from "../interfaces/service/auth/IAuthService";
+import { authConfig } from "../config/auth.config";
 
 export class AuthController {
   constructor(
@@ -72,6 +74,35 @@ export class AuthController {
       res.status(200).json({
         success: true,
         message: "OTP sent successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async login(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const input: ILoginDTO = req.body;
+
+      const result =
+        await this.authService.login(input);
+
+      res.cookie(
+        "refreshToken",
+        result.refreshToken,
+        authConfig.refreshTokenCookie,
+      );
+
+      res.status(200).json({
+        success: true,
+        data: {
+          user: result.user,
+          accessToken: result.accessToken,
+        },
       });
     } catch (error) {
       next(error);

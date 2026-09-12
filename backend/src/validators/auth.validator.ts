@@ -18,6 +18,11 @@ export const signupSchema = z.object({
     .max(128, "Password must not exceed 128 characters"),
 });
 
+export const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8).max(128),
+});
+
 export const verifyOtpSchema = z.object({
   email: z.email(),
   otp: z.string().regex(/^\d{6}$/, "OTP must be 6 digits"),
