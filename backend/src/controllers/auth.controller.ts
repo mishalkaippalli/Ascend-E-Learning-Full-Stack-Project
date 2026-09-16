@@ -1,29 +1,20 @@
-import {
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import { NextFunction, Request, Response } from 'express';
 
-import { 
+import {
   ISignupDTO,
   IVerifyOtpDTO,
   IResendOtpDTO,
-  ILoginDTO
-     } from "../dtos/auth.dto";
+  ILoginDTO,
+} from '../dtos/auth.dto';
 
-import { IAuthService } from "../interfaces/service/auth/IAuthService";
-import { authConfig } from "../config/auth.config";
+import { IAuthService } from '../interfaces/service/auth/IAuthService';
+import { authConfig } from '../config/auth.config';
+import { UnauthorizedError } from '../errors/unauthorized.error';
 
 export class AuthController {
-  constructor(
-    private readonly authService: IAuthService,
-  ) {}
+  constructor(private readonly authService: IAuthService) {}
 
-  async signup(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const input: ISignupDTO = req.body;
 
@@ -46,13 +37,11 @@ export class AuthController {
     try {
       const otpData: IVerifyOtpDTO = req.body;
 
-      await this.authService.verifyEmailOtp(
-        otpData,
-      );
+      await this.authService.verifyEmailOtp(otpData);
 
       res.status(200).json({
         success: true,
-        message: "Email verified successfully",
+        message: 'Email verified successfully',
       });
     } catch (error) {
       next(error);
@@ -67,32 +56,25 @@ export class AuthController {
     try {
       const otpData: IResendOtpDTO = req.body;
 
-      await this.authService.resendEmailOtp(
-        otpData,
-      );
+      await this.authService.resendEmailOtp(otpData);
 
       res.status(200).json({
         success: true,
-        message: "OTP sent successfully",
+        message: 'OTP sent successfully',
       });
     } catch (error) {
       next(error);
     }
   }
 
-  async login(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const input: ILoginDTO = req.body;
 
-      const result =
-        await this.authService.login(input);
+      const result = await this.authService.login(input);
 
       res.cookie(
-        "refreshToken",
+        'refreshToken',
         result.refreshToken,
         authConfig.refreshTokenCookie,
       );
@@ -102,6 +84,31 @@ export class AuthController {
         data: {
           user: result.user,
           accessToken: result.accessToken,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async refresh(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+
+      if (!refreshToken) {
+        throw new UnauthorizedError('Refresh token is required');
+      }
+
+      const accessToken = await this.authService.refresh(refreshToken);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          accessToken,
         },
       });
     } catch (error) {

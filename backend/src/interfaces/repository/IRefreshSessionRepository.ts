@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-import { RefreshSessionDocument } from "../../models/auth/refresh-session.model";
+import { RefreshSessionDocument } from '../../models/auth/refresh-session.model';
 
 export interface CreateRefreshSessionData {
   userId: Types.ObjectId;
@@ -10,15 +10,9 @@ export interface CreateRefreshSessionData {
 }
 
 export interface IRefreshSessionRepository {
-  create(
-    data: CreateRefreshSessionData,
-  ): Promise<RefreshSessionDocument>;
+  create(data: CreateRefreshSessionData): Promise<RefreshSessionDocument>;
 
-  findByTokenId(
-    tokenId: string,
-  ): Promise<RefreshSessionDocument | null>;
+  findByTokenId(tokenId: string): Promise<RefreshSessionDocument | null>;
 
-  revokeByTokenId(
-    tokenId: string,
-  ): Promise<RefreshSessionDocument | null>;
+  revokeByTokenId(tokenId: string): Promise<RefreshSessionDocument | null>;
 }

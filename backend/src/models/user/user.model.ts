@@ -1,9 +1,6 @@
-import mongoose, {
-  HydratedDocument,
-  Schema,
-} from "mongoose";
+import mongoose, { HydratedDocument, Schema } from 'mongoose';
 
-import { UserRole } from "../../types/auth.types";
+import { UserRole } from '../../types/auth.types';
 
 export interface IUser {
   name: string;
@@ -87,10 +84,7 @@ const userSchema = new Schema<IUser>(
   },
 );
 
-export const User = mongoose.model<IUser>(
-  "User",
-  userSchema,
-);
+export const User = mongoose.model<IUser>('User', userSchema);
 // import mongoose, { Schema, model , Document} from "mongoose";
 // import { UserRole } from "../../types/auth.types";
 

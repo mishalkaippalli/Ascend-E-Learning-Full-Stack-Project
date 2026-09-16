@@ -1,15 +1,9 @@
-import {
-  ISignupResponseDTO,
-} from "../dtos/auth.dto";
+import { ISignupResponseDTO } from '../dtos/auth.dto';
 
-import {
-  UserDocument,
-} from "../models/user/user.model";
+import { UserDocument } from '../models/user/user.model';
 
 export class UserMapper {
-  static toSignupResponse(
-    user: UserDocument,
-  ): ISignupResponseDTO {
+  static toSignupResponse(user: UserDocument): ISignupResponseDTO {
     return {
       id: user._id.toString(),
       name: user.name,

@@ -1,8 +1,5 @@
 export interface IRefreshTokenHasher {
   hash(token: string): string;
 
-  verify(
-    token: string,
-    hashedToken: string,
-  ): boolean;
+  verify(token: string, hashedToken: string): boolean;
 }

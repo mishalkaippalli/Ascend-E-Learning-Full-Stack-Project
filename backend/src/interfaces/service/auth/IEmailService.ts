@@ -1,6 +1,3 @@
 export interface IEmailService {
-  sendVerificationOtp(
-    email: string,
-    otp: string,
-  ): Promise<void>;
+  sendVerificationOtp(email: string, otp: string): Promise<void>;
 }

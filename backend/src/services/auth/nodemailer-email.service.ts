@@ -1,17 +1,12 @@
-import { emailTransporter } from "../../config/email";
-import { IEmailService } from "../../interfaces/service/auth/IEmailService";
+import { emailTransporter } from '../../config/email';
+import { IEmailService } from '../../interfaces/service/auth/IEmailService';
 
-export class NodemailerEmailService
-  implements IEmailService
-{
-  async sendVerificationOtp(
-    email: string,
-    otp: string,
-  ): Promise<void> {
+export class NodemailerEmailService implements IEmailService {
+  async sendVerificationOtp(email: string, otp: string): Promise<void> {
     await emailTransporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
-      subject: "Verify your Ascend account",
+      subject: 'Verify your Ascend account',
       text: `Your Ascend verification OTP is ${otp}. This OTP expires in 5 minutes.`,
       html: `
         <h2>Verify your Ascend account</h2>

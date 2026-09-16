@@ -1,39 +1,40 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { authController } from "../config/dependencies";
-import { validate } from "../middlewares/validate.middleware";
-import { 
+import { authController } from '../config/dependencies';
+import { validate } from '../middlewares/validate.middleware';
+import {
   signupSchema,
   loginSchema,
   verifyOtpSchema,
   resendOtpSchema,
-  } from "../validators/auth.validator";
+} from '../validators/auth.validator';
 
 const router = Router();
 
 router.post(
-  "/signup",
+  '/signup',
   validate(signupSchema),
   authController.signup.bind(authController),
 );
 
 router.post(
-  "/verify-otp",
+  '/verify-otp',
   validate(verifyOtpSchema),
   authController.verifyEmailOtp.bind(authController),
 );
 
 router.post(
-  "/resend-otp",
+  '/resend-otp',
   validate(resendOtpSchema),
   authController.resendEmailOtp.bind(authController),
 );
 
 router.post(
-  "/login",
+  '/login',
   validate(loginSchema),
   authController.login.bind(authController),
 );
 
-export default router;
+router.post('/refresh', authController.refresh.bind(authController));
 
+export default router;

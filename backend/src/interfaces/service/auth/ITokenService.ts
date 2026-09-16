@@ -1,22 +1,14 @@
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
-} from "../../../types/auth.types";
+} from '../../../types/auth.types';
 
 export interface ITokenService {
-  generateAccessToken(
-    payload: AccessTokenPayload,
-  ): string;
+  generateAccessToken(payload: AccessTokenPayload): string;
 
-  generateRefreshToken(
-    payload: RefreshTokenPayload,
-  ): string;
+  generateRefreshToken(payload: RefreshTokenPayload): string;
 
-  verifyAccessToken(
-    token: string,
-  ): AccessTokenPayload;
+  verifyAccessToken(token: string): AccessTokenPayload;
 
-  verifyRefreshToken(
-    token: string,
-  ): RefreshTokenPayload;
+  verifyRefreshToken(token: string): RefreshTokenPayload;
 }

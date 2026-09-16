@@ -1,5 +1,4 @@
-
-import { UserRole } from "../types/auth.types";
+import { UserRole } from '../types/auth.types';
 
 export interface ISignupDTO {
   name: string;
@@ -39,4 +38,3 @@ export interface IVerifyOtpDTO {
 export interface IResendOtpDTO {
   email: string;
 }
-

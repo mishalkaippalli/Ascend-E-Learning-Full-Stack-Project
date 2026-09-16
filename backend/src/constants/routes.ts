@@ -1,5 +1,5 @@
 export const ROUTES = {
-    AUTH: {
-        REGISTER: "/register",
-    }
-}
+  AUTH: {
+    REGISTER: '/register',
+  },
+};

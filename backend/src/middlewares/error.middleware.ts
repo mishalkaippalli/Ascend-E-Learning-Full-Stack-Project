@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
-import { AppError } from "../errors/app-error.js";
-import { logger } from "../config/logger.js";
+import { AppError } from '../errors/app-error.js';
+import { logger } from '../config/logger.js';
 
 export const errorMiddleware = (
   error: unknown,
@@ -15,7 +15,7 @@ export const errorMiddleware = (
         statusCode: error.statusCode,
         error: error.message,
       },
-      "Application error",
+      'Application error',
     );
 
     res.status(error.statusCode).json({
@@ -26,10 +26,10 @@ export const errorMiddleware = (
     return;
   }
 
-  logger.error(error, "Unhandled application error");
+  logger.error(error, 'Unhandled application error');
 
   res.status(500).json({
     success: false,
-    message: "Internal server error",
+    message: 'Internal server error',
   });
 };

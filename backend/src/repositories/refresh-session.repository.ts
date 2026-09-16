@@ -1,27 +1,21 @@
-import { Types } from "mongoose";
-
 import {
   CreateRefreshSessionData,
   IRefreshSessionRepository,
-} from "../interfaces/repository/IRefreshSessionRepository";
+} from '../interfaces/repository/IRefreshSessionRepository';
 
 import {
   RefreshSession,
   RefreshSessionDocument,
-} from "../models/auth/refresh-session.model";
+} from '../models/auth/refresh-session.model';
 
-export class RefreshSessionRepository
-  implements IRefreshSessionRepository
-{
+export class RefreshSessionRepository implements IRefreshSessionRepository {
   async create(
     data: CreateRefreshSessionData,
   ): Promise<RefreshSessionDocument> {
     return RefreshSession.create(data);
   }
 
-  async findByTokenId(
-    tokenId: string,
-  ): Promise<RefreshSessionDocument | null> {
+  async findByTokenId(tokenId: string): Promise<RefreshSessionDocument | null> {
     return RefreshSession.findOne({
       tokenId,
     });
