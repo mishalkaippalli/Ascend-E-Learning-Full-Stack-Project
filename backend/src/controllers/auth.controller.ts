@@ -5,6 +5,9 @@ import {
   IVerifyOtpDTO,
   IResendOtpDTO,
   ILoginDTO,
+  IForgotPasswordDTO,
+  IVerifyResetOtpDTO,
+  IResetPasswordDTO
 } from '../dtos/auth.dto';
 
 import { IAuthService } from '../interfaces/service/auth/IAuthService';
@@ -110,6 +113,91 @@ export class AuthController {
         data: {
           accessToken,
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+
+      if (refreshToken) {
+        await this.authService.logout(refreshToken);
+      }
+
+      res.clearCookie('refreshToken', authConfig.refreshTokenCookie);  //  Clear client-side cookie by passing original matching flags (path/domain/security)
+                                                                       // Express internally overrides maxAge with a past date (1970) to force browser deletion
+
+      res.status(200).json({
+        success: true,
+        message: 'Logged out successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const input: IForgotPasswordDTO = req.body;
+
+      await this.authService.forgotPassword(input);
+
+      res.status(200).json({
+        success: true,
+        message:
+          'If an account exists with this email, a password reset OTP has been sent.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyResetOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const input: IVerifyResetOtpDTO = req.body;
+
+      const resetToken =
+        await this.authService.verifyResetOtp(input);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          resetToken,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const input: IResetPasswordDTO = req.body;
+
+      await this.authService.resetPassword(input);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully',
       });
     } catch (error) {
       next(error);

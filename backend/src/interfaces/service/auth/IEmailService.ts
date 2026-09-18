@@ -1,3 +1,9 @@
+import { OtpPurpose } from "../../../types/auth.types";
+
 export interface IEmailService {
-  sendVerificationOtp(email: string, otp: string): Promise<void>;
+  sendOtp(
+    email: string,
+    otp: string,
+    purpose: OtpPurpose,
+  ): Promise<void>;
 }

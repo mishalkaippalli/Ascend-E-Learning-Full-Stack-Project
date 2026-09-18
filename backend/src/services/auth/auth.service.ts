@@ -6,9 +6,13 @@ import {
   IVerifyOtpDTO,
   IResendOtpDTO,
   ILoginDTO,
+  IForgotPasswordDTO,
+  IVerifyResetOtpDTO,
+  IResetPasswordDTO
 } from '../../dtos/auth.dto';
 import { Types } from 'mongoose';
 import { IPasswordHasher } from '../../interfaces/service/auth/IPasswordHasher';
+import { IPasswordResetTokenService } from '../../interfaces/service/auth/IPasswordResetTokenService';
 import { IAuthService } from '../../interfaces/service/auth/IAuthService';
 import { ConflictError } from '../../errors/conflict.error';
 import { BadRequestError } from '../../errors/bad-request.error';
@@ -34,6 +38,7 @@ export class AuthService implements IAuthService {
     private readonly tokenService: ITokenService,
     private readonly refreshSessionRepository: IRefreshSessionRepository,
     private readonly refreshTokenHasher: IRefreshTokenHasher,
+    private passwordResetTokenService: IPasswordResetTokenService,
   ) {}
 
   async signup(input: ISignupDTO): Promise<ISignupResponseDTO> {
@@ -59,7 +64,7 @@ export class AuthService implements IAuthService {
       OtpPurpose.EMAIL_VERIFICATION,
     );
 
-    await this.emailService.sendVerificationOtp(normalizedEmail, otp);
+    await this.emailService.sendOtp(normalizedEmail, otp, OtpPurpose.EMAIL_VERIFICATION);
 
     return UserMapper.toSignupResponse(user);
   }
@@ -166,7 +171,7 @@ export class AuthService implements IAuthService {
       OtpPurpose.EMAIL_VERIFICATION,
     );
 
-    await this.emailService.sendVerificationOtp(normalizedEmail, otp);
+    await this.emailService.sendOtp(normalizedEmail, otp, OtpPurpose.EMAIL_VERIFICATION);
 
     const cooldownAcquired = await this.otpService.acquireResendCooldown(
       normalizedEmail,
@@ -217,5 +222,93 @@ export class AuthService implements IAuthService {
     });
 
     return accessToken;
+  }
+
+  async logout(refreshToken: string): Promise<void> {
+      try {
+        const payload =
+          this.tokenService.verifyRefreshToken(refreshToken);
+
+        await this.refreshSessionRepository.revokeByTokenId(
+          payload.jti,
+        );
+      } catch {
+        // Ignore invalid or expired refresh tokens during logout.
+      }
+    }
+
+  async forgotPassword(
+    data: IForgotPasswordDTO,
+  ): Promise<void> {
+    const normalizedEmail = data.email.toLowerCase().trim();
+
+    const user =
+      await this.userRepository.findByEmail(normalizedEmail);
+
+    if (!user) {
+      return;
+    }
+
+    const otp = await this.otpService.generateAndStore(
+      normalizedEmail,
+      OtpPurpose.PASSWORD_RESET,
+    );
+
+    await this.emailService.sendOtp(
+      normalizedEmail,
+      otp,
+      OtpPurpose.PASSWORD_RESET,
+    );
+  }
+
+  async verifyResetOtp(
+    data: IVerifyResetOtpDTO,
+  ): Promise<string> {
+    const normalizedEmail = data.email.toLowerCase().trim();
+
+    const user =
+      await this.userRepository.findByEmail(normalizedEmail);
+
+    if (!user) {
+      throw new UnauthorizedError('Invalid or expired OTP');
+    }
+
+    const isValid =
+      await this.otpService.verify(
+        normalizedEmail,
+        OtpPurpose.PASSWORD_RESET,
+        data.otp,
+      );
+
+    if (!isValid) {
+      throw new UnauthorizedError('Invalid or expired OTP');
+    }
+
+    const resetToken =
+      await this.passwordResetTokenService.generateAndStore(
+        user._id.toString(),
+      );
+
+    return resetToken;
+  }
+
+  async resetPassword(data: IResetPasswordDTO): Promise<void> {
+    const userId =
+      await this.passwordResetTokenService.consume(
+        data.resetToken,
+      );
+
+    const hashedPassword =
+      await this.passwordHasher.hash(data.newPassword);
+
+    const user =
+      await this.userRepository.updatePassword(
+        new Types.ObjectId(userId),
+        hashedPassword,
+      );
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
   }
 }

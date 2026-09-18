@@ -38,3 +38,17 @@ export interface IVerifyOtpDTO {
 export interface IResendOtpDTO {
   email: string;
 }
+
+export interface IForgotPasswordDTO {
+  email: string;
+}
+
+export interface IVerifyResetOtpDTO {
+  email: string;
+  otp: string;
+}
+
+export interface IResetPasswordDTO {
+  resetToken: string;
+  newPassword: string;
+}

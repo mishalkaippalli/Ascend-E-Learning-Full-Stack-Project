@@ -29,4 +29,26 @@ export const resendOtpSchema = z.object({
   email: z.email(),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+export const verifyResetOtpSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  otp: z
+    .string()
+    .length(6, 'OTP must be 6 digits')
+    .regex(/^\d+$/, 'OTP must contain only digits'),
+});
+
+export const resetPasswordSchema = z.object({
+  resetToken: z
+    .string()
+    .min(1, 'Reset token is required'),
+
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters'),
+});
+
 export type SignupInput = z.infer<typeof signupSchema>;

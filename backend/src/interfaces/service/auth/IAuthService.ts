@@ -4,6 +4,9 @@ import {
   IVerifyOtpDTO,
   IResendOtpDTO,
   ILoginDTO,
+  IForgotPasswordDTO,
+  IVerifyResetOtpDTO,
+  IResetPasswordDTO
 } from '../../../dtos/auth.dto';
 
 import { LoginResult } from '../../../types/auth.types';
@@ -18,4 +21,12 @@ export interface IAuthService {
   login(data: ILoginDTO): Promise<LoginResult>;
 
   refresh(refreshToken: string): Promise<string>;
+
+  logout(refreshToken: string): Promise<void>;
+
+  forgotPassword(data: IForgotPasswordDTO): Promise<void>;
+
+  verifyResetOtp(data: IVerifyResetOtpDTO): Promise<string>;
+
+  resetPassword(data: IResetPasswordDTO): Promise<void>;
 }

@@ -7,6 +7,9 @@ import {
   loginSchema,
   verifyOtpSchema,
   resendOtpSchema,
+  forgotPasswordSchema,
+  verifyResetOtpSchema,
+  resetPasswordSchema
 } from '../validators/auth.validator';
 
 const router = Router();
@@ -35,6 +38,30 @@ router.post(
   authController.login.bind(authController),
 );
 
-router.post('/refresh', authController.refresh.bind(authController));
+router.post(
+  '/refresh',
+   authController.refresh.bind(authController));
 
+router.post(
+  '/logout',
+  authController.logout.bind(authController),
+);
+
+router.post(
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  authController.forgotPassword.bind(authController),
+);
+
+router.post(
+  '/verify-reset-otp',
+  validate(verifyResetOtpSchema),
+  authController.verifyResetOtp.bind(authController),
+);
+
+router.post(
+  '/reset-password',
+  validate(resetPasswordSchema),
+  authController.resetPassword.bind(authController),
+);
 export default router;

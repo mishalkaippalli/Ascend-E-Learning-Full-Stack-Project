@@ -1,8 +1,9 @@
 import { emailTransporter } from '../../config/email';
 import { IEmailService } from '../../interfaces/service/auth/IEmailService';
+import { OtpPurpose } from '../../types/auth.types';
 
 export class NodemailerEmailService implements IEmailService {
-  async sendVerificationOtp(email: string, otp: string): Promise<void> {
+  async sendOtp(email: string, otp: string, purpose: OtpPurpose): Promise<void> {
     await emailTransporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,

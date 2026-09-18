@@ -8,6 +8,7 @@ import { NodemailerEmailService } from '../services/auth/nodemailer-email.servic
 import { JwtTokenService } from '../services/auth/jwt-token.service';
 import { RefreshSessionRepository } from '../repositories/refresh-session.repository';
 import { Sha256RefreshTokenHasher } from '../services/auth/sha256-refresh-token-hasher';
+import { RedisPasswordResetTokenService } from '../services/auth/redis-password-reset-token.service';
 
 const userRepository: IUserRepository = new UserRepository();
 const passwordHasher = new Argon2PasswordHasher();
@@ -16,6 +17,7 @@ const emailService = new NodemailerEmailService();
 const tokenService = new JwtTokenService();
 const refreshSessionRepository = new RefreshSessionRepository();
 const refreshTokenHasher = new Sha256RefreshTokenHasher();
+const passwordResetTokenService = new RedisPasswordResetTokenService();
 
 const authService = new AuthService(
   userRepository,
@@ -25,6 +27,7 @@ const authService = new AuthService(
   tokenService,
   refreshSessionRepository,
   refreshTokenHasher,
+  passwordResetTokenService
 );
 
 export const authController = new AuthController(authService);
