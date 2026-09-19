@@ -3,6 +3,8 @@ import {
   IRefreshSessionRepository,
 } from '../interfaces/repository/IRefreshSessionRepository';
 
+import { Types } from 'mongoose';
+
 import {
   RefreshSession,
   RefreshSessionDocument,
@@ -34,6 +36,20 @@ export class RefreshSessionRepository implements IRefreshSessionRepository {
       },
       {
         new: true,
+      },
+    );
+  }
+
+   async revokeAllByUserId(
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    await RefreshSession.updateMany(
+      {
+        userId,
+        revokedAt: null,
+      },
+      {
+        revokedAt: new Date(),
       },
     );
   }

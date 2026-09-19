@@ -20,7 +20,7 @@ import { UnauthorizedError } from '../../errors/unauthorized.error';
 import { ForbiddenError } from '../../errors/forbidden.error';
 import { NotFoundError } from '../../errors/not-found.error';
 import { TooManyRequestsError } from '../../errors/too-many-requests.error';
-import { UserRole, OtpPurpose, LoginResult } from '../../types/auth.types';
+import { UserRole, OtpPurpose, LoginResult, RefreshResult } from '../../types/auth.types';
 import { UserMapper } from '../../mappers/user.mapper';
 import { IOtpService } from '../../interfaces/service/auth/IOtpService';
 import { IEmailService } from '../../interfaces/service/auth/IEmailService';
@@ -185,13 +185,13 @@ export class AuthService implements IAuthService {
     }
   }
 
-  async refresh(refreshToken: string): Promise<string> {
+  async refresh(refreshToken: string): Promise<RefreshResult> {
     const payload = this.tokenService.verifyRefreshToken(refreshToken);
 
     const session = await this.refreshSessionRepository.findByTokenId(
       payload.jti,
     );
-
+    
     if (!session) {
       throw new UnauthorizedError('Invalid refresh token');
     }
@@ -203,7 +203,7 @@ export class AuthService implements IAuthService {
     if (session.expiresAt <= new Date()) {
       throw new UnauthorizedError('Refresh token has expired');
     }
-
+       
     if (!this.refreshTokenHasher.verify(refreshToken, session.tokenHash)) {
       throw new UnauthorizedError('Invalid refresh token');
     }
@@ -216,12 +216,39 @@ export class AuthService implements IAuthService {
       throw new UnauthorizedError('User not found');
     }
 
+    const newTokenId = randomUUID();
+
+    const newRefreshToken =
+      this.tokenService.generateRefreshToken({
+        sub: user._id.toString(),
+        jti: newTokenId,
+      });
+
+    const newRefreshTokenHash =
+       this.refreshTokenHasher.hash(newRefreshToken);
+
+    await this.refreshSessionRepository.create({
+        userId: user._id,
+        tokenId: newTokenId,
+        tokenHash: newRefreshTokenHash,
+        expiresAt: new Date(
+          Date.now() + authConfig.refreshToken.maxAge,
+        ),
+    });
+
+    await this.refreshSessionRepository.revokeByTokenId(
+      payload.jti,
+    );
+
     const accessToken = this.tokenService.generateAccessToken({
       sub: user._id.toString(),
       role: user.role,
     });
 
-    return accessToken;
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 
   async logout(refreshToken: string): Promise<void> {
@@ -298,17 +325,23 @@ export class AuthService implements IAuthService {
         data.resetToken,
       );
 
+    const objectUserId = new Types.ObjectId(userId);
+
     const hashedPassword =
       await this.passwordHasher.hash(data.newPassword);
 
     const user =
       await this.userRepository.updatePassword(
-        new Types.ObjectId(userId),
+        objectUserId,
         hashedPassword,
       );
 
     if (!user) {
       throw new NotFoundError('User not found');
     }
+
+    await this.refreshSessionRepository.revokeAllByUserId(
+      objectUserId,
+    );
   }
 }

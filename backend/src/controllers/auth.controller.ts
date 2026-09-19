@@ -106,13 +106,19 @@ export class AuthController {
         throw new UnauthorizedError('Refresh token is required');
       }
 
-      const accessToken = await this.authService.refresh(refreshToken);
+      const result = await this.authService.refresh(refreshToken);
 
-      res.status(200).json({
+    res.cookie(
+      'refreshToken',
+      result.refreshToken,
+      authConfig.refreshTokenCookie,
+    );
+
+    res.status(200).json({
         success: true,
         data: {
-          accessToken,
-        },
+          accessToken : result.accessToken,
+        } 
       });
     } catch (error) {
       next(error);

@@ -15,4 +15,6 @@ export interface IRefreshSessionRepository {
   findByTokenId(tokenId: string): Promise<RefreshSessionDocument | null>;
 
   revokeByTokenId(tokenId: string): Promise<RefreshSessionDocument | null>;
+
+  revokeAllByUserId(userId: Types.ObjectId): Promise<void>;
 }

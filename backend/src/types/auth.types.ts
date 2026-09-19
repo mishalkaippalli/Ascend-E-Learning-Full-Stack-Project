@@ -30,3 +30,8 @@ export interface LoginResult {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface RefreshResult {
+  accessToken: string;
+  refreshToken: string;
+}

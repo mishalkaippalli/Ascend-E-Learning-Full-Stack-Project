@@ -9,7 +9,7 @@ import {
   IResetPasswordDTO
 } from '../../../dtos/auth.dto';
 
-import { LoginResult } from '../../../types/auth.types';
+import { LoginResult, RefreshResult } from '../../../types/auth.types';
 
 export interface IAuthService {
   signup(data: ISignupDTO): Promise<ISignupResponseDTO>;
@@ -20,7 +20,7 @@ export interface IAuthService {
 
   login(data: ILoginDTO): Promise<LoginResult>;
 
-  refresh(refreshToken: string): Promise<string>;
+  refresh(refreshToken: string): Promise<RefreshResult>;
 
   logout(refreshToken: string): Promise<void>;
 
