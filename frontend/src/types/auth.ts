@@ -32,3 +32,8 @@ export interface LoginResponseDTO {
   }
   accessToken: string
 }
+
+export interface VerifyEmailOtpDTO {
+  email: string
+  otp: string
+}

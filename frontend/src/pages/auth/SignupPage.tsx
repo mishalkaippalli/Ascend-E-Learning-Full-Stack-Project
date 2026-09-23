@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { signup } from '../../services/authService'
 import { signupSchema } from '../../schemas/authSchema'
-
+import { useNavigate } from 'react-router-dom'
 
 function SignupPage() {
   const [name, setName] = useState('')
@@ -14,6 +14,10 @@ function SignupPage() {
     email?: string
     password?: string
   }>({})
+
+  const [serverError, setServerError] = useState('')
+
+  const navigate = useNavigate()
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
@@ -55,19 +59,27 @@ function SignupPage() {
     try {
       const response = await signup(result.data)
 
-      console.log('Signup successful:', response)
+      navigate('/verify-otp', {                 // Navigate to the OTP page and temporarily pass the user's email.   // Router state keeps this temporary data out of the URL.                                             // Router state keeps this temporary data out of the URL.
+        state: {
+          email: response.email,
+        },
+      })
+
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.log(error.response?.data)
-        } else {
-            console.error('Unexpected error:', error)
-        }
+      if (axios.isAxiosError(error)) {
+        setServerError(
+          error.response?.data?.message || 'Something went wrong',
+        )
+      } else {
+        setServerError('Something went wrong')
       }
+     }
     }
 
   return (
     <div>
       <h1>Create your Ascend account</h1>
+      {serverError && <p>{serverError}</p>}
 
       <form onSubmit={handleSubmit}>
         <input
@@ -76,6 +88,7 @@ function SignupPage() {
           value={name}
           onChange={(event) => {
             setName(event.target.value)
+            setServerError('')
 
             if (errors.name) {
                 setErrors((previous) => ({
@@ -94,6 +107,7 @@ function SignupPage() {
           value={email}
           onChange={(event) => {
             setEmail(event.target.value)
+            setServerError('')
 
             if (errors.email) {
                 setErrors((previous) => ({
