@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { authController } from '../config/dependencies';
 import { validate } from '../middlewares/validate.middleware';
+
 import {
   signupSchema,
   loginSchema,
@@ -64,4 +65,6 @@ router.post(
   validate(resetPasswordSchema),
   authController.resetPassword.bind(authController),
 );
+
+
 export default router;

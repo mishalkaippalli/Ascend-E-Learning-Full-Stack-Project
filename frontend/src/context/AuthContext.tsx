@@ -1,4 +1,5 @@
 import { createContext, useState } from 'react'
+import { setAccessToken } from '../services/api/tokenHolder'
 
 interface AuthUser {
   id: string
@@ -26,7 +27,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<AuthUser | null>(null)                                // Stores the currently authenticated user.
 
-  const [accessToken, setAccessToken] = useState<string | null>(null)                    // Stores the current access token in memory.
+  const [accessToken, setAccessTokenState] = useState<string | null>(null)                    // Stores the current access token in memory.
   
   const [isLoading, setIsLoading] = useState(true)                                        // Tracks whether authentication initialization is still running.
 
@@ -38,7 +39,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     accessToken: string,
   ) => {
     setUser(user)
-    setAccessToken(accessToken)
+    setAccessTokenState(accessToken)
+    setAccessToken(accessToken)                                      // Keep the access token available to Axios outside the React tree.
     setIsLoading(false)
   }
 

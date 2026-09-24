@@ -22,6 +22,6 @@
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../frontend/src/schemas"],
   "exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }
