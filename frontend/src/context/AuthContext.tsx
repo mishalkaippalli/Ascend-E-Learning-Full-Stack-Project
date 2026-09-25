@@ -1,5 +1,8 @@
-import { createContext, useState } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import { setAccessToken } from '../services/api/tokenHolder'
+import { refreshAccessToken } from '../services/auth/authService'
+import { getCurrentUser } from '../services/user/userService'
+
 
 interface AuthUser {
   id: string
@@ -44,6 +47,27 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }
 
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const accessToken = await refreshAccessToken()
+         
+        setAccessTokenState(accessToken)                                              // Keep React state and the Axios token holder synchronized.
+        setAccessToken(accessToken)                                                     // Store the refreshed token before making authenticated API requests.
+
+        const user = await getCurrentUser()
+
+        setUser(user)
+      } catch {
+        
+        setUser(null)                                                                   // No valid refresh session means the user is not authenticated.
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    restoreSession()
+  }, [])
   return (
     <AuthContext.Provider
       value={{

@@ -18,6 +18,18 @@ export const signupSchema = z.object({
     .max(128, 'Password must not exceed 128 characters'),
 })
 
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email('Please provide a valid email address'),
+
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must not exceed 128 characters'),
+})
+
 export const verifyOtpSchema = z.object({
   email: z.string().email('Invalid email address'),
 
@@ -25,4 +37,19 @@ export const verifyOtpSchema = z.object({
     .string()
     .length(6, 'OTP must be 6 digits')
     .regex(/^\d+$/, 'OTP must contain only digits'),
+})
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email('Please provide a valid email address'),
+})
+
+export const resetPasswordSchema = z.object({
+  resetToken: z.string().min(1, 'Reset token is required'),
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must not exceed 128 characters'),
 })

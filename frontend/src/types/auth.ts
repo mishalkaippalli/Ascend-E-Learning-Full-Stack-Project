@@ -37,3 +37,17 @@ export interface VerifyEmailOtpDTO {
   email: string
   otp: string
 }
+
+export interface VerifyResetOtpDTO {
+  email: string
+  otp: string
+}
+
+export interface VerifyResetOtpResponseDTO {
+  resetToken: string
+}
+
+export interface ResetPasswordDTO {
+  resetToken: string
+  newPassword: string
+}

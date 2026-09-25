@@ -3,6 +3,9 @@ import HomePage from '../pages/HomePage'
 import SignupPage from '../pages/auth/SignupPage'
 import VerifyOtpPage from '../pages/auth/VerifyOtpPage'
 import LoginPage from '../pages/auth/LoginPage'
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
+import VerifyResetOtpPage from '../pages/auth/VerifyResetOtpPage'
+import ResetPasswordPage from '../pages/auth/ResetPasswordPage'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +23,18 @@ const router = createBrowserRouter([
   {
   path: '/login',
   element: <LoginPage />,
+  },
+  {
+  path: '/forgot-password',
+  element: <ForgotPasswordPage />,
+  },
+  {
+  path: '/verify-reset-otp',
+  element: <VerifyResetOtpPage />,
+  },
+  {
+  path: '/reset-password',
+  element: <ResetPasswordPage />,
   },
 ])
 
