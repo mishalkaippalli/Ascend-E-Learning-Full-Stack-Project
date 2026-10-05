@@ -12,10 +12,14 @@ function ResetPasswordPage() {
 
   const resetToken = location.state?.resetToken
 
-  const [newPassword, setNewPassword] = useState('')
+  
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
     if (!resetToken) {
@@ -37,6 +41,7 @@ function ResetPasswordPage() {
     const result = resetPasswordSchema.safeParse({
       resetToken,
       newPassword,
+      confirmPassword
     })
 
     if (!result.success) {
@@ -47,7 +52,10 @@ function ResetPasswordPage() {
     setIsLoading(true)
 
     try {
-      const response = await resetPassword(result.data)
+      const response = await resetPassword({
+        resetToken,
+        newPassword: result.data.newPassword
+      })
 
       console.log('Password reset successful:', response)
 
@@ -98,18 +106,29 @@ function ResetPasswordPage() {
               New password
             </label>
 
-            <input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(event) => {
-                setNewPassword(event.target.value)
-                setError('')
-                setSuccessMessage('')
-              }}
-              placeholder="Enter your new password"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-primary outline-none transition focus:border-accent"
-            />
+            <div className="relative">
+              <input
+                id="newPassword"
+                type={showPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(event) => {
+                  setNewPassword(event.target.value)
+                  setError('')
+                  setSuccessMessage('')
+                }}
+                placeholder="Enter your new password"
+                className="w-full rounded-lg border border-border bg-surface px-4 py-3 pr-12 text-primary outline-none transition focus:border-accent"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((previous) => !previous)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
 
             {error && (
               <p className="mt-2 text-sm text-error">
@@ -122,6 +141,41 @@ function ResetPasswordPage() {
                 {successMessage}
               </p>
             )}
+          </div>
+          
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="mb-2 block text-sm font-medium text-primary"
+            >
+              Confirm password
+            </label>
+
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(event) => {
+                  setConfirmPassword(event.target.value)
+                  setError('')
+                  setSuccessMessage('')
+                }}
+                placeholder="Confirm your new password"
+                className="w-full rounded-lg border border-border bg-surface px-4 py-3 pr-12 text-primary outline-none transition focus:border-accent"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((previous) => !previous)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                aria-label={
+                  showConfirmPassword ? 'Hide password' : 'Show password'
+                }
+              >
+                {showConfirmPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
 
           <button

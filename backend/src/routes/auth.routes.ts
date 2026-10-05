@@ -30,7 +30,7 @@ router.post(
 router.post(
   '/resend-otp',
   validate(resendOtpSchema),
-  authController.resendEmailOtp.bind(authController),
+  authController.resendOtp.bind(authController),
 );
 
 router.post(

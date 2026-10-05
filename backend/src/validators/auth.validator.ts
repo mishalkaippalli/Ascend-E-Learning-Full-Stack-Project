@@ -27,6 +27,10 @@ export const verifyOtpSchema = z.object({
 
 export const resendOtpSchema = z.object({
   email: z.email(),
+  purpose: z.enum([
+    'EMAIL_VERIFICATION',
+    'PASSWORD_RESET',
+  ]),
 });
 
 export const forgotPasswordSchema = z.object({

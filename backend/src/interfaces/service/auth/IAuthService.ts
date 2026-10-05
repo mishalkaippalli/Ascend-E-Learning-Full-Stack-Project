@@ -16,7 +16,7 @@ export interface IAuthService {
 
   verifyEmailOtp(data: IVerifyOtpDTO): Promise<void>;
 
-  resendEmailOtp(data: IResendOtpDTO): Promise<void>;
+  resendOtp(data: IResendOtpDTO): Promise<void>;
 
   login(data: ILoginDTO): Promise<LoginResult>;
 

@@ -51,7 +51,8 @@ export class AuthController {
     }
   }
 
-  async resendEmailOtp(
+
+  async resendOtp(
     req: Request,
     res: Response,
     next: NextFunction,
@@ -59,7 +60,7 @@ export class AuthController {
     try {
       const otpData: IResendOtpDTO = req.body;
 
-      await this.authService.resendEmailOtp(otpData);
+      await this.authService.resendOtp(otpData);
 
       res.status(200).json({
         success: true,

@@ -153,7 +153,7 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async resendEmailOtp(input: IResendOtpDTO): Promise<void> {
+  async resendOtp(input: IResendOtpDTO): Promise<void> {
     const normalizedEmail = input.email.trim().toLowerCase();
 
     const user = await this.userRepository.findByEmail(normalizedEmail);
@@ -162,21 +162,29 @@ export class AuthService implements IAuthService {
       throw new NotFoundError('User not found');
     }
 
-    if (user.emailVerified) {
+    if (
+      input.purpose === OtpPurpose.EMAIL_VERIFICATION &&
+      user.emailVerified
+    ) {
       throw new BadRequestError('Email is already verified');
     }
 
     const otp = await this.otpService.generateAndStore(
       normalizedEmail,
-      OtpPurpose.EMAIL_VERIFICATION,
+      input.purpose,
     );
 
-    await this.emailService.sendOtp(normalizedEmail, otp, OtpPurpose.EMAIL_VERIFICATION);
-
-    const cooldownAcquired = await this.otpService.acquireResendCooldown(
+    await this.emailService.sendOtp(
       normalizedEmail,
-      OtpPurpose.EMAIL_VERIFICATION,
+      otp,
+      input.purpose,
     );
+
+    const cooldownAcquired =
+      await this.otpService.acquireResendCooldown(
+        normalizedEmail,
+        input.purpose,
+      );
 
     if (!cooldownAcquired) {
       throw new TooManyRequestsError(

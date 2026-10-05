@@ -1,22 +1,29 @@
 import { z } from 'zod'
 
-export const signupSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must not exceed 50 characters'),
+export const signupSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters')
+      .max(50, 'Name must not exceed 50 characters'),
 
-  email: z
-    .string()
-    .trim()
-    .email('Please provide a valid email address'),
+    email: z
+      .string()
+      .trim()
+      .email('Please provide a valid email address'),
 
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password must not exceed 128 characters'),
-})
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(128, 'Password must not exceed 128 characters'),
+
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
 export const loginSchema = z.object({
   email: z
@@ -46,10 +53,18 @@ export const forgotPasswordSchema = z.object({
     .email('Please provide a valid email address'),
 })
 
-export const resetPasswordSchema = z.object({
-  resetToken: z.string().min(1, 'Reset token is required'),
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password must not exceed 128 characters'),
-})
+export const resetPasswordSchema = z
+  .object({
+    resetToken: z.string().min(1, 'Reset token is required'),
+
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(128, 'Password must not exceed 128 characters'),
+
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })

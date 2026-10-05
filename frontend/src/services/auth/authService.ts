@@ -9,7 +9,8 @@ import type {
   LoginResponseDTO,
   VerifyResetOtpDTO,
   VerifyResetOtpResponseDTO,
-  ResetPasswordDTO
+  ResetPasswordDTO,
+  OtpPurpose,
 } from '../../types/auth'
 
 
@@ -92,13 +93,14 @@ export async function resetPassword(
   return response.data
 }
 
-export async function resendEmailOtp(
+export async function resendOtp(
   email: string,
+  purpose: OtpPurpose,
 ): Promise<{ success: boolean; message: string }> {
-  
-  const response = await api.post<{ success: boolean; message: string }>(                  // Requests a new email-verification OTP for the current signup flow.
+
+  const response = await api.post<{ success: boolean; message: string }>(                        // The same endpoint handles both email verification and password-reset OTPs.
     '/auth/resend-otp',
-    { email },
+    { email, purpose },
   )
 
   return response.data

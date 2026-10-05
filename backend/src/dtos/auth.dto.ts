@@ -1,4 +1,4 @@
-import { UserRole } from '../types/auth.types';
+import { OtpPurpose, UserRole } from '../types/auth.types';
 
 export interface ISignupDTO {
   name: string;
@@ -37,6 +37,7 @@ export interface IVerifyOtpDTO {
 
 export interface IResendOtpDTO {
   email: string;
+  purpose: OtpPurpose;
 }
 
 export interface IForgotPasswordDTO {

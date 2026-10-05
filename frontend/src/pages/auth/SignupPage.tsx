@@ -11,12 +11,16 @@ function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  
 
 
   const [errors, setErrors] = useState<{
     name?: string
     email?: string
     password?: string
+    confirmPassword?: string
   }>({})
 
   const [serverError, setServerError] = useState('')
@@ -34,6 +38,7 @@ function SignupPage() {
       name,
       email,
       password,
+      confirmPassword,
     })
 
     if (!result.success) {
@@ -41,6 +46,7 @@ function SignupPage() {
         name?: string
         email?: string
         password?: string
+        confirmPassword?: string
       } = {}
 
       result.error.issues.forEach((issue) => {
@@ -49,7 +55,8 @@ function SignupPage() {
         if (
           field === 'name' ||
           field === 'email' ||
-          field === 'password'
+          field === 'password'||
+          field === 'confirmPassword'
         ) {
           fieldErrors[field] = issue.message
         }
@@ -219,7 +226,59 @@ function SignupPage() {
                 {errors.password}
               </p>
             )}
-          </div>
+           </div>
+
+          <div>
+
+          <label
+            htmlFor="confirmPassword"
+            className="mb-2 block text-sm font-medium text-primary"
+          >
+            Confirm Password
+          </label>
+
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(event) => {
+                setConfirmPassword(event.target.value)
+                setServerError('')
+
+                if (errors.confirmPassword) {
+                  setErrors((previous) => ({
+                    ...previous,
+                    confirmPassword: undefined,
+                  }))
+                }
+              }}
+              placeholder="Confirm your password"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-3 pr-12 text-primary outline-none transition focus:border-accent"
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword((current) => !current)
+              }
+              className="absolute inset-y-0 right-3 flex items-center text-muted transition hover:text-primary"
+              aria-label={
+                showConfirmPassword
+                  ? 'Hide confirm password'
+                  : 'Show confirm password'
+              }
+            >
+              {showConfirmPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+            </button>
+        </div>
+
+        {errors.confirmPassword && (
+          <p className="mt-2 text-sm text-error">
+            {errors.confirmPassword}
+          </p>
+        )}
+      </div>
 
           <button
             type="submit"

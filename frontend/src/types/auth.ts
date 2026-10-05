@@ -51,3 +51,7 @@ export interface ResetPasswordDTO {
   resetToken: string
   newPassword: string
 }
+
+export type OtpPurpose =
+  | 'EMAIL_VERIFICATION'
+  | 'PASSWORD_RESET'

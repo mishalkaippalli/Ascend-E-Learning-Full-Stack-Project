@@ -1,20 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef} from 'react'
 import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-import { verifyResetOtp } from '../../services/auth/authService'
+import { verifyResetOtp, resendOtp } from '../../services/auth/authService'
 import { verifyOtpSchema } from '../../schemas/authSchema'
 
 function VerifyResetOtpPage() {
-  const location = useLocation()
+  const location = useLocation()  
   const navigate = useNavigate()
 
   const { email, message } = location.state || {}
 
   const [otp, setOtp] = useState('')
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(60)
+  const [resendMessage, setResendMessage] = useState('')
 
   useEffect(() => {
     if (!email) {
@@ -22,6 +26,18 @@ function VerifyResetOtpPage() {
       navigate('/forgot-password', { replace: true })                                     // Prevent users from entering the reset flow without starting it from Forgot Password.
     }
   }, [email, navigate])
+
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return
+    }
+
+    const timer = setInterval(() => {
+      setResendCooldown((previous) => previous - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [resendCooldown])
 
   if (!email) {
     return null
@@ -70,6 +86,36 @@ function VerifyResetOtpPage() {
     }
   }
 
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isResending) {
+      return
+    }
+
+    setError('')
+    setResendMessage('')
+    setIsResending(true)
+
+    try {
+      const response = await resendOtp(email, 'PASSWORD_RESET')
+
+      setResendMessage(response.message)
+      setResendCooldown(60)
+      setOtp('')
+    } catch (error) {
+      console.error('Failed to resend reset OTP:', error)
+
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.response?.data?.message || 'Failed to resend OTP',
+        )
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
+    } finally {
+      setIsResending(false)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-background px-6 py-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
@@ -103,19 +149,72 @@ function VerifyResetOtpPage() {
               Verification code
             </label>
 
-            <input
-              id="otp"
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              value={otp}
-              onChange={(event) => {
-                setOtp(event.target.value)
-                setError('')
-              }}
-              placeholder="Enter 6-digit code"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-primary outline-none transition focus:border-accent"
-            />
+            <div className="flex justify-between gap-2">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <input
+                  key={index}
+                  ref={(element) => {
+                    inputRefs.current[index] = element
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={otp[index] ?? ''}
+                  onChange={(event) => {
+                    const value = event.target.value
+
+                    // Accept only one numeric digit in each OTP box.
+                    if (!/^\d?$/.test(value)) {
+                      return
+                    }
+
+                    const otpArray = otp.split('')
+                    otpArray[index] = value
+
+                    const newOtp = otpArray.join('').slice(0, 6)
+
+                    setOtp(newOtp)
+                    setError('')
+
+                    // Move focus forward after entering a digit.
+                    if (value && index < 5) {
+                      inputRefs.current[index + 1]?.focus()
+                    }
+                  }}
+                  onPaste={(event) => {
+                    event.preventDefault()
+
+                    const pastedValue = event.clipboardData
+                      .getData('text')
+                      .replace(/\D/g, '')
+                      .slice(0, 6)
+
+                    if (!pastedValue) {
+                      return
+                    }
+
+                    setOtp(pastedValue)
+                    setError('')
+
+                    // Focus the next available box after pasting.
+                    const nextIndex = Math.min(pastedValue.length, 5)
+                    inputRefs.current[nextIndex]?.focus()
+                  }}
+                  onKeyDown={(event) => {
+                    // Move back when deleting from an empty box.
+                    if (
+                      event.key === 'Backspace' &&
+                      !otp[index] &&
+                      index > 0
+                    ) {
+                      inputRefs.current[index - 1]?.focus()
+                    }
+                  }}
+                  className="h-14 w-12 rounded-lg border border-border bg-surface text-center text-xl font-medium text-primary outline-none transition focus:border-accent"
+                  aria-label={`OTP digit ${index + 1}`}
+                />
+              ))}
+            </div>
 
             {error && (
               <p className="mt-2 text-sm text-error">
@@ -131,6 +230,27 @@ function VerifyResetOtpPage() {
           >
             {isLoading ? 'Verifying...' : 'Verify code'}
           </button>
+
+          <div className="text-center">
+            {resendMessage && (
+              <p className="mb-2 text-sm text-success">
+                {resendMessage}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              disabled={isResending || resendCooldown > 0}
+              className="text-sm font-medium text-accent disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isResending
+                ? 'Sending...'
+                : resendCooldown > 0
+                  ? `Resend OTP in ${resendCooldown}s`
+                  : 'Resend OTP'}
+            </button>
+          </div>
         </form>
       </div>
     </main>
