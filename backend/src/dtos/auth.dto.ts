@@ -53,3 +53,11 @@ export interface IResetPasswordDTO {
   resetToken: string;
   newPassword: string;
 }
+
+export interface IRefreshResponseDTO {
+  accessToken: string;
+}
+
+export interface IVerifyResetOtpResponseDTO {
+  resetToken: string;
+}

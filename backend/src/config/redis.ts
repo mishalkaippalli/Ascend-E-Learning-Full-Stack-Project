@@ -19,7 +19,7 @@ redisClient.on('error', (error) => {
 export const connectRedis = async (): Promise<void> => {
   await redisClient.connect();
 
-  logger.info('Redis connected successfully');
+  logger.info('Redis connected ');
 };
 
 export { redisClient };

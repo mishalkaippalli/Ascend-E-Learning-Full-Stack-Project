@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 import { AppError } from '../errors/app-error.js';
+import { ApiErrorResponse } from '../types/api.types.js';
 import { logger } from '../config/logger.js';
 
 export const errorMiddleware = (
@@ -18,18 +19,22 @@ export const errorMiddleware = (
       'Application error',
     );
 
-    res.status(error.statusCode).json({
+    const response: ApiErrorResponse = {
       success: false,
       message: error.message,
-    });
+    };
+
+    res.status(error.statusCode).json(response);
 
     return;
   }
 
   logger.error(error, 'Unhandled application error');
 
-  res.status(500).json({
+  const response: ApiErrorResponse = {
     success: false,
     message: 'Internal server error',
-  });
+  };
+
+  res.status(500).json(response);
 };
