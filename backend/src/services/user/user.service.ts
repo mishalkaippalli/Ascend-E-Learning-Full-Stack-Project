@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'
 
 import { ISignupResponseDTO } from '../../dtos/auth.dto'
-import { IUserRepository } from '../../interfaces/repository/user/IUserRepository'
+import { IUserRepository } from '../../interfaces/repository/IUserRepository'
 import { IUserService } from '../../interfaces/service/user/IUserService'
 import { UserMapper } from '../../mappers/user.mapper'
 import { NotFoundError } from '../../errors/not-found.error'

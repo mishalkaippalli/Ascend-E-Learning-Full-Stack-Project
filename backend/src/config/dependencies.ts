@@ -10,17 +10,19 @@ import { RefreshSessionRepository } from '../repositories/refresh-session.reposi
 import { Sha256RefreshTokenHasher } from '../services/auth/sha256-refresh-token-hasher';
 import { RedisPasswordResetTokenService } from '../services/auth/redis-password-reset-token.service';
 import { AuthenticateMiddleware } from '../middlewares/authenticate.middleware';
+import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
 
 import { UserController } from '../controllers/user.controller'
 import { UserService } from '../services/user/user.service'
 
 const userRepository: IUserRepository = new UserRepository();
-const userService = new UserService(userRepository)
+const userService = new UserService(userRepository);
 const passwordHasher = new Argon2PasswordHasher();
 const otpService = new RedisOtpService();
 const emailService = new NodemailerEmailService();
 const tokenService = new JwtTokenService();
 const authenticateMiddleware = new AuthenticateMiddleware(tokenService);
+const authorizationMiddleware = new AuthorizationMiddleware();
 const refreshSessionRepository = new RefreshSessionRepository();
 const refreshTokenHasher = new Sha256RefreshTokenHasher();
 const passwordResetTokenService = new RedisPasswordResetTokenService();
@@ -40,4 +42,7 @@ export const authController = new AuthController(authService);
 
 export const userController = new UserController(userService)
 
-export { authenticateMiddleware };
+export {
+  authenticateMiddleware,
+  authorizationMiddleware,
+};

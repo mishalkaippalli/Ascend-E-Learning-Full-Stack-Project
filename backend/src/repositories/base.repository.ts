@@ -7,6 +7,7 @@ export abstract class BaseRepository<
   TCreate extends Partial<TEntity>,
   TUpdate extends Partial<TEntity>,
 > implements IBaseRepository<TEntity, TCreate, TUpdate> {
+  
   protected constructor(protected readonly model: Model<TEntity>) {}
 
   async create(data: TCreate): Promise<HydratedDocument<TEntity>> {
