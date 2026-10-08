@@ -60,8 +60,8 @@ export async function refreshAccessToken(): Promise<string> {
 export async function forgotPassword(
   email: string,
 ): Promise<{ success: boolean; message: string }> {
-  // Requests a password-reset OTP without revealing whether the email is registered.
-  const response = await api.post<{ success: boolean; message: string }>(
+  
+  const response = await api.post<{ success: boolean; message: string }>(                                // Requests a password-reset OTP without revealing whether the email is registered.
     '/auth/forgot-password',
     { email },
   )

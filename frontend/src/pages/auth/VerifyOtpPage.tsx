@@ -109,7 +109,7 @@ function VerifyOtpPage() {
 
   useEffect(() => {
     if (!email) {
-      navigate('/signup') // If the page was opened without an email, return to signup.
+      navigate('/signup')       // If the page was opened without an email, return to signup.
     }
   }, [email, navigate])
 
@@ -123,7 +123,7 @@ function VerifyOtpPage() {
     }, 1000)
 
     return () => {
-      window.clearInterval(timer) // Cleans up the interval when the countdown changes or the page unmounts.
+      window.clearInterval(timer)                                           // Cleans up the interval when the countdown changes or the page unmounts.
     }
   }, [resendCooldown])
 

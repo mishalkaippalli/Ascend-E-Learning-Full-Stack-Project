@@ -6,6 +6,7 @@ import LoginPage from '../pages/auth/LoginPage'
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
 import VerifyResetOtpPage from '../pages/auth/VerifyResetOtpPage'
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage'
+import PublisherSignupPage from '../pages/publisher/PublisherSignupPage'
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,11 @@ const router = createBrowserRouter([
   path: '/reset-password',
   element: <ResetPasswordPage />,
   },
+  
+  {
+  path: '/publisher/signup',
+  element: <PublisherSignupPage />,
+},
 ])
 
 export default router

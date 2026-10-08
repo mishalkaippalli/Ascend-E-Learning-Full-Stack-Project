@@ -1,3 +1,40 @@
+export type OtpPurpose =
+  | 'EMAIL_VERIFICATION'
+  | 'PASSWORD_RESET'
+
+export type UserRole =
+  | 'user'
+  | 'publisher'
+  | 'admin'
+
+export type PublisherType =
+  | 'individual'
+  | 'organization'
+
+export type PublisherVerificationStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+
+export interface PublisherSignupDTO {
+  name: string
+  email: string
+  password: string
+  publisherType: PublisherType
+  organizationName?: string
+}
+
+export interface PublisherSignupResponseDTO {
+  userId: string
+  publisherId: string
+  name: string
+  email: string
+  publisherType: PublisherType
+  organizationName?: string
+  verificationStatus: PublisherVerificationStatus
+  emailVerified: boolean
+}
+
 export interface ApiResponse<T> {
   success: boolean
   data: T
@@ -13,7 +50,7 @@ export interface SignupResponseDTO {
   id: string
   name: string
   email: string
-  role: string
+  role: UserRole
   emailVerified: boolean
 }
 
@@ -27,7 +64,7 @@ export interface LoginResponseDTO {
     id: string
     name: string
     email: string
-    role: string
+    role: UserRole
     emailVerified: boolean
   }
   accessToken: string
@@ -52,6 +89,3 @@ export interface ResetPasswordDTO {
   newPassword: string
 }
 
-export type OtpPurpose =
-  | 'EMAIL_VERIFICATION'
-  | 'PASSWORD_RESET'

@@ -56,7 +56,7 @@ export class AuthService implements IAuthService {
       name: input.name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      role: UserRole.STUDENT,
+      role: UserRole.USER,
     });
 
     const otp = await this.otpService.generateAndStore(

@@ -68,3 +68,46 @@ export const resetPasswordSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
+
+
+ export const publisherSignupSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters')
+      .max(50, 'Name must not exceed 50 characters'),
+
+    email: z
+      .string()
+      .trim()
+      .email('Please provide a valid email address'),
+
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(128, 'Password must not exceed 128 characters'),
+
+    confirmPassword: z.string(),
+
+    publisherType: z.enum(['individual', 'organization']),
+
+    organizationName: z
+      .string()
+      .trim()
+      .max(100, 'Organization name must not exceed 100 characters')
+      .optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+  .refine(
+    (data) =>
+      data.publisherType === 'individual' ||
+      Boolean(data.organizationName),
+    {
+      message: 'Organization name is required',
+      path: ['organizationName'],
+    },
+  )
