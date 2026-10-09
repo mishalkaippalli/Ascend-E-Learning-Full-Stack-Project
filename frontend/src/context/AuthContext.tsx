@@ -1,8 +1,7 @@
 import { createContext, useState, useEffect } from 'react'
 import { setAccessToken } from '../services/api/tokenHolder'
-import { refreshAccessToken } from '../services/auth/authService'
+import { refreshAccessToken, logout as logoutRequest } from '../services/auth/authService'
 import { getCurrentUser } from '../services/user/userService'
-
 
 interface AuthUser {
   id: string
@@ -22,6 +21,8 @@ interface AuthContextValue {
     user: AuthUser,
     accessToken: string,
   ) => void
+
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -45,6 +46,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessTokenState(accessToken)
     setAccessToken(accessToken)                                      // Keep the access token available to Axios outside the React tree.
     setIsLoading(false)
+  }
+  
+  const logout = async () => {
+    try {
+      await logoutRequest()
+    } finally {
+      // Clear local authentication state even if the request fails.
+      setUser(null)
+      setAccessTokenState(null)
+      setAccessToken(null)
+    }
   }
 
   useEffect(() => {
@@ -76,6 +88,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         isLoading,
         setCredentials,
+        logout
       }}
     >
       {children}

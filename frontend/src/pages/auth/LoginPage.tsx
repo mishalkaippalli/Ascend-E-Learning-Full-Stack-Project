@@ -61,7 +61,9 @@ function LoginPage() {
       setCredentials(response.user, response.accessToken)
 
       // Send each authenticated user to the area allowed for their role.
-      if (response.user.role === 'publisher') {
+      if (response.user.role === 'user') {
+        navigate('/explore')
+      } else if (response.user.role === 'publisher') {
         navigate('/publisher/dashboard')
       } else if (response.user.role === 'admin') {
         navigate('/admin/dashboard')

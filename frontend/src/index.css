@@ -1,35 +1,79 @@
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
-@theme {
-  --color-background: #FAF9F6;
-  --color-surface: #FFFFFF;
+/* Make Tailwind's dark: utilities respond to the .dark class. */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --color-primary: #18181B;
-  --color-secondary: #57534E;
-  --color-muted: #78716C;
+/* Connect Tailwind utility colors to our theme variables. */
+@theme inline {
+  --color-background: var(--app-background);
+  --color-surface: var(--app-surface);
 
-  --color-border: #E7E5E4;
+  --color-primary: var(--app-primary);
+  --color-secondary: var(--app-secondary);
+  --color-muted: var(--app-muted);
 
-  --color-accent: #D97706;
-  --color-accent-soft: #FEF3C7;
+  --color-border: var(--app-border);
 
-  --color-success: #15803D;
-  --color-error: #B91C1C;
+  --color-accent: var(--app-accent);
+  --color-accent-soft: var(--app-accent-soft);
+
+  --color-success: var(--app-success);
+  --color-error: var(--app-error);
 
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'DM Serif Display', serif;
 }
 
+/* Default theme: Light */
 :root {
+  color-scheme: light;
+
+  --app-background: #FAF9F6;
+  --app-surface: #FFFFFF;
+
+  --app-primary: #18181B;
+  --app-secondary: #57534E;
+  --app-muted: #78716C;
+
+  --app-border: #E7E5E4;
+
+  --app-accent: #D97706;
+  --app-accent-soft: #FEF3C7;
+
+  --app-success: #15803D;
+  --app-error: #B91C1C;
+
   font-family: 'Inter', sans-serif;
-  color: #18181B;
-  background-color: #FAF9F6;
+  color: var(--app-primary);
+  background-color: var(--app-background);
+}
+
+/* Dark theme: override the same variables. */
+:root.dark {
+  color-scheme: dark;
+
+  --app-background: #18181B;
+  --app-surface: #27272A;
+
+  --app-primary: #FAFAF9;
+  --app-secondary: #D6D3D1;
+  --app-muted: #A8A29E;
+
+  --app-border: #3F3F46;
+
+  --app-accent: #F59E0B;
+  --app-accent-soft: #422006;
+
+  --app-success: #4ADE80;
+  --app-error: #F87171;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  background-color: #FAF9F6;
+  background-color: var(--app-background);
+  color: var(--app-primary);
 }

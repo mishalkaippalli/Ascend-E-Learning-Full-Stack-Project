@@ -23,19 +23,23 @@ export class AuthenticateMiddleware {
       throw new UnauthorizedError('Invalid authorization header');
     }
 
+    let payload;
+
     try {
-      const payload = this.tokenService.verifyAccessToken(token);
-
-      req.user = {
-        id: payload.sub,
-        role: payload.role,
-      };
-
-      next();
+      // Convert token verification failures into a 401 error.
+      payload = this.tokenService.verifyAccessToken(token);
     } catch {
       throw new UnauthorizedError(
         'Invalid or expired access token',
       );
     }
+
+    // Store the authenticated user's identity for later middleware.
+    req.user = {
+      id: payload.sub,
+      role: payload.role,
+    };
+
+    next();
   }
 }

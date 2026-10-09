@@ -7,12 +7,21 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
 import VerifyResetOtpPage from '../pages/auth/VerifyResetOtpPage'
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage'
 import PublisherSignupPage from '../pages/publisher/PublisherSignupPage'
+import ProtectedRoute from '../routes/ProtectedRoute'
+import UserLayout from '../layouts/UserLayout'
+import ExplorePage from '../pages/user/ExplorePage'
+import PublisherLayout from '../layouts/PublisherLayout'
+import PublisherDashboardPage from '../pages/publisher/PublisherDashboardPage'
+import AdminLayout from '../layouts/AdminLayout'
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage'
+
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <HomePage />,
   },
+
   {
     path: '/signup',
     element: <SignupPage />,
@@ -41,7 +50,49 @@ const router = createBrowserRouter([
   {
   path: '/publisher/signup',
   element: <PublisherSignupPage />,
-},
+  },
+  {
+    element: <ProtectedRoute allowedRoles={['user']} />,
+    children: [
+      {
+        element: <UserLayout />,
+        children: [
+          {
+            path: '/explore',
+            element: <ExplorePage />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute allowedRoles={['publisher']} />,
+    children: [
+      {
+        element: <PublisherLayout />,
+        children: [
+          {
+            path: '/publisher/dashboard',
+            element: <PublisherDashboardPage />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute allowedRoles={['admin']} />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          {
+            path: '/admin/dashboard',
+            element: <AdminDashboardPage />,
+          },
+        ],
+      },
+    ],
+  },
 ])
 
 export default router
